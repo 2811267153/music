@@ -1,0 +1,7 @@
+html, body{
+  background-color: #f1f1f1;
+  /* max-width: 750px; */
+  margin: auto;
+  min-width: 405px;
+}
+@import  './beast.css' ;
