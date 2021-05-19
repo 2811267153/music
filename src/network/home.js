@@ -33,3 +33,21 @@ export function getVideo(offset){
     }
   })
 }
+
+export function getHistoryRrecord(uid){
+  return request({
+    url: '/user/record',
+    params: {
+      uid
+    }
+  })
+}
+
+export function getDigAlbum(uid){
+  return request({
+    url: '/digitalAlbum/purchased',
+    params: {
+      uid
+    }
+  })
+}

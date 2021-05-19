@@ -5,7 +5,7 @@
       <div class="bar"></div>
       <div class="title">
         <span class="span">hi~ {{personal.nickname}}</span>
-        <img :src="personal.avatarUrl" alt="" />
+        <img v-lazy="personal.avatarUrl" alt="" />
       </div>
       <!-- 轮播图 -->
       <swiper id="swiper" v-if="banner.length != ''" :banner = 'banner'></swiper>
@@ -26,30 +26,32 @@
       >
     </el-row>
     <nav-little></nav-little>
-    <history-record></history-record>
+    <history-record v-if="listenMusicHistury.length != 0" :listenMusicHistury = 'listenMusicHistury'></history-record>
     <recommend-info v-if="video.length != 0" :video='video'></recommend-info>
+    <dig-album :paidAlbums='paidAlbums'></dig-album>
   </div>
 </template>
 
 <script>
-// import Swiper from "../../components/swiper/swiper";
 import swiper from '../../components/swiper/swiper';
 import navLittle from './navLittle';
 import historyRecord from './historyRecord';
 import recommendInfo from './recommendInfo';
+import digAlbum from './paidAlbums';
 
-import { getLogin, getRecommendedsongs, getBanner, getVideo } from "../../network/home.js";
+import { getLogin, getRecommendedsongs, getBanner, getVideo, getHistoryRrecord, getDigAlbum } from "../../network/home.js";
 export default {
   name: "Home",
   components: {
     historyRecord,
     swiper,
     navLittle,
-    recommendInfo
+    recommendInfo,
+    digAlbum
   },
   data() {
     return {
-      userId: "17572696252",
+      phone: "17572696252",
       password: "xybwdhxd0422",
       personal: {},
       recmmengSong: [],
@@ -57,13 +59,18 @@ export default {
       banner: [],
       video: [],
       offset: 6,
+      uid: '3970607697',
+      listenMusicHistury: [],//最近听歌数据
+      paidAlbums: [], //获取数字专辑
     };
   },
   created() {
-    this.getLogin(this.userId, this.password); //用户数据
+    this.getLogin(this.phone, this.password); //用户数据
     this.getRecommendedsongs()  //最新歌曲
     this.getBanner(this.type)
     this.getVideo(this.offset)
+    this.getHistoryRrecord(this.uid)
+    this.getDigAlbum(this.uid)  //获取数字专辑
   },
 
   methods: {
@@ -72,6 +79,8 @@ export default {
       getLogin(phone, password).then((res) => {
         // console.log(res);
         this.personal = res.data.profile;
+        this.uid = this.personal.userId
+        // console.log(this.personal);
       });
     },
     getRecommendedsongs() {
@@ -91,15 +100,31 @@ export default {
     getVideo(offset){
       getVideo(offset).then(res =>{
         this.video = res.data.datas
-        // this.video.push(res.data)
-        console.log(this.video);
+      })
+    },
+    getHistoryRrecord(uid){
+      getHistoryRrecord(uid).then(res => {
+        // console.log(res);
+        this.listenMusicHistury = res.data.allData.slice(0, 5)
+        // console.log(this.listenMusicHistury);
+      })
+    },
+    getDigAlbum(uid){
+      getDigAlbum(uid).then(res =>{
+        console.log(res);
+        this.paidAlbums = res.data.paidAlbums
+        console.log(this.paidAlbums);
       })
     }
   },
 };
 </script>
 
-<style>
+<style scomed>
+#home{
+  width: calc(100% - 5%);
+  overflow: hidden;
+}
 .top{
   background-color: #fff;
   padding: 0 2%;
@@ -108,10 +133,11 @@ export default {
 #top{
   margin-top: 1rem;
   margin-left: 2%;
+  width: calc(100% -  5%)
 }
 .bar {
   height: 6vh;
-  width: 100%;
+  width: calc(100% - 5%);
 }
 .span {
   margin: 0px;
@@ -121,20 +147,20 @@ export default {
 }
 .title {
   display: flex;
+  width: calc(100% - 5%);
   justify-content: space-between;
 }
 #swiper{
+  width: calc(100% - 5%);
   border-radius: 8px;
 }
-img {
-  width: 10%;
+.title img {
+  width: 10%  !important;
   border-radius: 50px;
   margin-bottom: 20px;
   vertical-align: middle;
 }
-el-button {
-  outline: none;
-}
+
 .button {
   color: ccc;
 }

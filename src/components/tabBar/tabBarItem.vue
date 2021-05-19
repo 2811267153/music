@@ -33,6 +33,6 @@ export default {
 
 <style>
   .tab-bar-item{
-    width: 29%;
+    flex: 1;
   }
 </style>

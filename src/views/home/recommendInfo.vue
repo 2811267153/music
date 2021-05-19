@@ -1,8 +1,8 @@
 <template>
   <div id="recommend">
-    <div class="recommend" v-for="item in video" :key="item.key" @touchend='itemClick'>
-      <img v-if="isShow" :src="item.data.coverUrl" alt="">
-      <video controls :src="item.data.urlInfo.url" poster="posterimage.jpg">
+    <div class="recommend" v-for="(item, index) in video" :key="item.key" @touchend='isShows(index)'>
+      <img v-show="isShow" v-lazy="item.data.coverUrl" alt="">
+      <video ref="video" v-show="!isShow" :src="item.data.urlInfo.url">
       </video>
       <p>{{item.data.title}}</p>
     </div>
@@ -11,40 +11,56 @@
 <script>
 export default {
   name: "recommendInfo",
+
   data(){
     return{
-      isShow: false
+        isShow: true,
+        isPlay: false,
     }
   },
   props: ['video'],
   created() {
-    //do something after creating vue instance
-    console.log(this.video);
   },
-  methods: {    
-    isShow(){
-      return this.isShow != this.isShow
+  methods: {
+    isShows(index){
+      let that = this
+      if(this.isPlay == true){
+        that.isPlay = false
+        that.$refs.video[index].play()
+      }else{
+        that.$refs.video[index].pause()
+        that.isPlay = true
+      }
+      // if(this.isPlay){
+      //   !this.isPlay
+      // }
+      return this.isShow = false
     }
   },
   computed: {
 
+  },
+  mounted() {
+    //do something after mounting vue instance
   }
 }
 </script>
 <style scoped>
 #recommend{
   display: flex;
-  width: calc(100% - 4%);
   margin: 2%;
   justify-content: space-between;
   flex-wrap: wrap;
+  padding: 0px 2%;
+  background-color: #fff;
+  border-radius: 8px;
 }
 .recommend{
   width: 48%;
-  background-color: #fff;
   height: 20vh;
   margin-top: 2%;
   border-radius: 8px;
+  overflow: hidden;
 }
 video{
   width: 100%;
@@ -63,5 +79,12 @@ p{
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
 }
-
+img{
+  width: 100%;
+  border-radius: 0px;
+  border-radius: 8px;
+}
+img[lazy=loading] {
+  background-color: blue;
+ }
 </style>

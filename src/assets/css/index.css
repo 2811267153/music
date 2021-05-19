@@ -1,7 +1,7 @@
-html, body{
+ body{
   background-color: #f1f1f1;
-  /* max-width: 750px; */
-  margin: auto;
-  min-width: 405px;
 }
+img[lazy=loading] {
+  background-color: blue;
+ }
 @import  './beast.css' ;

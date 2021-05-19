@@ -36,6 +36,7 @@ export default {
 }
 
 p{
+  width: 100%;
   margin: 0px;
   padding-top: 3px;
 }

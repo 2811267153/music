@@ -26,15 +26,14 @@ export default {
 </script>
 <style scoped>
 #nav-little{
-  width: 100%;
-  width: calc(100% - 4%);
+  width: calc(100% - 5%);
   /* height: 7vh; */
   border-radius: 8px;
   margin: 2% 2%;
   background-color: #fff;
 }
 .nav-info{
-width: calc(100% - 4%);
+  width: calc(100% - 4%);
   display: flex;
   justify-content: space-between;
 }
