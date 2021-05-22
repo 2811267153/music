@@ -23,7 +23,7 @@ npm run lint
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).o
 
-使用 vue2 vue-cli3 创建的一个手机版webApp 目前的功能如下：
+### 使用 vue2 vue-cli3 创建的一个手机版webApp 目前的功能如下：
 ```
 1. 手机登录  可使用 短信 和 账号密码 进行 登录
 
