@@ -7,7 +7,19 @@
     </div>
     <div class="song-img">
       <img class="rotate-center " :src="this.$store.state.imgUrl" alt="" />
-      <div class="lyrics"></div>
+      <div class="lyrics">
+        <div class="lyrics-item" ref="lyric" :style="{transform: transfrom}">
+          <div
+            ref="lyrics"
+            v-for="(lrcItem, index) in lyricArr"
+            @dblclick="selectMusicProgress(lrcItem.time)"
+            :class="{ active: index === currentLyricIndex }"
+            :key="index"
+          >
+            {{ lrcItem.lyc }}
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="nav">
@@ -16,10 +28,16 @@
       ><span class="iconfont icon-fenxiang"></span>
     </div>
     <div class="controller">
-      <div class="controller-progress" ref="controllerProgress" >
-        <div ref="progress" class="progress" :style="{width: offserWidth}"><div></div></div>
+      <div class="controller-progress" ref="controllerProgress">
+        <div ref="progress" class="progress" :style="{ width: offserWidth }">
+          <div></div>
+        </div>
       </div>
-      <audio ref="audio" :src="this.$store.state.sUrl"></audio>
+      <audio
+        ref="audio"
+        :src="this.$store.state.sUrl"
+        @timeupdate="playing"
+      ></audio>
       <div class="controller-item">
         <i class="iconfont icon-shangyishou-yuanshijituantubiao"></i>
       </div>
@@ -42,26 +60,61 @@ export default {
     return {
       id: "",
       lyric: "",
-      play: false,
+      play: "",
       currentTimes: 0,
       duration: "",
       currentSong: "",
-      offserWidth: ''
+      offserWidth: "",
+      currentLyricIndex: "",
+      lrcTime: "",
+      offsetTop: "0px",
+      transfrom: ''
     };
   },
   created() {
     this.id = this.$store.state.songList.id;
-    // this.getLyrics(this.id); //获取歌词
+    this.getLyrics(this.id); //获取歌词
   },
-
+  mounted() {
+    this.play = this.$refs.audio.pause();
+    setTimeout(() => {}, 1000);
+  },
   methods: {
+    playing(e) {
+      // console.log(e.target.currentTime, "aa"); // // 根据event事件对象获取 audio元素, 在通过currentTime属性获取audio的播放时间
+      let now = e.target.currentTime;
+
+      //遍历所有歌词 与 现在的播放时间对比
+      for (let i = 0; i < this.lyric.length; i++) {
+        // 如果已经便利到 最后 ， 那么 直接 最后一条高亮
+
+        if (i === this.lyric.length - 1) {
+          this.currentLyricIndex = i;
+          break;
+        }
+        this.lrcTime = this.lyricArr[i].time;
+        //获取 下一条 个去播放时间
+        let nextTime = this.lyricArr[i + 1].time;
+        // 当前媒体播放时间大于等于本条歌词播放时间, 并且小于下一条歌词的播放时间
+        if (now >= this.lrcTime && now < nextTime) {
+          // console.log('赏花');
+          this.currentLyricIndex = i;
+          if (i > 1) {
+            this.transfrom = `translateY(${40 - (18 * (i + 1))}px)`
+            console.log(this.transfrom );
+          }else{
+            this.transfrom = `translateY(${0}px)`
+          }
+          break;
+        }
+      }
+    },
+
     itemClick() {
       this.play ? this.$refs.audio.play() : this.$refs.audio.pause();
       this.play = !this.play;
-    console.log(parseInt(this.$refs.audio.duration));
-      // console.log(this.$refs.audio.currentTime);
-      // console.log(this.currentTime);
-      // this.$refs.controllerProgress.style.width = `${(this.currentTime / this.duration) * 100}%` + 'px'
+
+      this.duration = parseInt(this.$refs.audio.duration); //获取 歌曲总时长
     },
 
     goBlack() {
@@ -76,10 +129,28 @@ export default {
       });
     },
   },
+  computed: {
+    lyricArr() {
+      let arr = this.lyric.split(/\n/);
+      // 正则组匹配
+      return arr.map((l) => {
+        // "[01:00.125] 歌词"
+        // 正则小括号组匹配,如果正则与字符串匹配成功
+        // RegExp就可以通过$n属性,获取正则表达式中对应组匹配的文本
+        /\[(\d+):(\d+\.\d+)\](.+)/.test(l);
+        // console.log(RegExp.$1, RegExp.$2, RegExp.$3)
+        return {
+          time: parseInt(RegExp.$1) * 60 + parseFloat(RegExp.$2),
+          lyc: RegExp.$3,
+        };
+      });
+    },
+  },
+
   watch: {
-    play(old, newPlay) {
+    play(old) {
       let that = this;
-      if (newPlay == true) {
+      if (old == false) {
         that.getCurrentTimes = setInterval(() => {
           // console.log(parseInt(that.$refs.audio.currentTime));
           that.currentTimes = parseInt(that.$refs.audio.currentTime);
@@ -90,9 +161,14 @@ export default {
     },
 
     currentTimes(old) {
-      this.offserWidth = (old - this.duration) / 1 + '%'
-      console.log(old, this.offserWidth);
+      this.offserWidth = (this.currentTimes / this.duration) * 100 + "%";
+      if (old == this.duration) {
+        this.play = true;
+      }
     },
+    id(old){
+      this.getLyrics(old)
+    }
   },
 };
 </script>
@@ -138,10 +214,16 @@ export default {
   margin-top: 20vh;
 }
 .lyrics {
-  height: 20vh;
+  height: 18vh;
   position: absolute;
+  font-size: 1rem;
+  letter-spacing: 0.6px;
   bottom: 0px;
   width: 100%;
+  overflow: hidden;
+}
+.lyrics-item{
+  transition: all .2s;
 }
 .nav {
   display: flex;
@@ -219,5 +301,11 @@ export default {
     -webkit-transform: rotate(360deg);
     transform: rotate(360deg);
   }
+}
+.active {
+  color: #4c83ff;
+  font-size: 1.2rem;
+  margin: 2%, 0;
+  padding: 5%, 0;
 }
 </style>

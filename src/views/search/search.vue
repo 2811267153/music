@@ -9,7 +9,7 @@
         name="search"
         placeholder="想听点什么？"
       />
-      <button class="iconfont icon-sousuo"></button>
+      <button class="iconfont icon-sousuo" @click="getSearch"></button>
       <div ref="input" class="input-autocomplete  animate__animated  animate__fadeInDownBig" v-show="msg != 0">
         <div class="autocomplete-info" v-for="(ele, index) in songList" :key="ele.id" @touchstart="itemClick(index)" >{{ele.name }}  — {{ ele.artists[0].name}}</div>
       </div>
@@ -19,7 +19,7 @@
   </div>
 </template>
 <script>
-import { getSearchSuggest, getMusicUrl, getAlbumImg, } from "../../network/search";
+import { getSearchSuggest, getMusicUrl, getAlbumImg, getSearchKey} from "../../network/search";
 
 import searchRec from "./searchREC";
 import searchTags from "./searchtags";
@@ -47,6 +47,12 @@ export default {
     }
   },
   methods: {
+    getSearch(){  
+      getSearchKey(this.msg).then(res => {
+        console.log(res);
+      })
+    },
+
     itemClick(index){
       this.id = this.songList[index].id
       getMusicUrl(this.id).then(res => {

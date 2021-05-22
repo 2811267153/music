@@ -52,3 +52,12 @@ export function getLyrics(id) {
         }
     })
 }
+
+export function getSearchKey(keywords) {
+    return request({
+        url: '/search/multimatch',
+        params: {
+            keywords
+        }
+    })
+}

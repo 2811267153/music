@@ -38,6 +38,7 @@ export default {
     function GetRandomNum(Min, Max) {
       var Range = Max - Min;
       var Rand = Math.random();
+      console.log(this.listenMusicHistury);
       return Min + Math.round(Rand * Range);
     }
     var num = GetRandomNum(0, this.imgURL.length);
