@@ -11,7 +11,7 @@
       <swiper id="swiper" v-if="banner.length != ''" :banner = 'banner'></swiper>
     </div>
     <!-- <swiper></swiper> -->
-    <el-row class="el-row" id="top">
+    <el-row class="el-row">
       <el-button class="button slide-in-blurred-right" size="small" round
         >最新歌曲</el-button
       >
